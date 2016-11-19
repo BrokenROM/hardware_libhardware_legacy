@@ -23,7 +23,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <poll.h>
+<<<<<<< HEAD
 #include <sys/syscall.h>
+=======
+#ifndef NO_FINIT_MODULE
+#include <sys/syscall.h>
+#endif
+
+>>>>>>> cm/cm-14.1
 
 #ifdef USES_TI_MAC80211
 #include <dirent.h>
@@ -200,8 +207,14 @@ char* get_samsung_wifi_type()
 }
 #endif
 
+#ifdef NO_FINIT_MODULE
+// System call provided by bionic but not in any header file.
+extern int init_module(void *, unsigned long, const char *);
+#endif
+
 int insmod(const char *filename, const char *args)
 {
+#ifndef NO_FINIT_MODULE
      /* O_NOFOLLOW is removed as wlan.ko is symlink pointing to
         the vendor specfic file which is in readonly location */
      int fd = open(filename, O_RDONLY | O_CLOEXEC);
@@ -215,7 +228,23 @@ int insmod(const char *filename, const char *args)
      }
      close(fd);
      return rc;
+#else
+    void *module;
+    unsigned int size;
+    int ret;
+
+    close(fd);
+
+    if (strncmp(buf, "murata", 6) == 0)
+        return "_murata";
+
+    if (strncmp(buf, "semcove", 7) == 0)
+        return "_semcove";
+
+    return ret;
+#endif
 }
+#endif
 
 int rmmod(const char *modname)
 {
@@ -1049,9 +1078,9 @@ int wifi_wait_on_socket(char *buf, size_t buflen)
     /*
      * Events strings are in the format
      *
-     *     IFNAME=iface <N>CTRL-EVENT-XXX 
+     *     IFNAME=iface <N>CTRL-EVENT-XXX
      *        or
-     *     <N>CTRL-EVENT-XXX 
+     *     <N>CTRL-EVENT-XXX
      *
      * where N is the message level in numerical form (0=VERBOSE, 1=DEBUG,
      * etc.) and XXX is the event name. The level information is not useful
