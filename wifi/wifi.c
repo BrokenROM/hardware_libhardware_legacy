@@ -23,14 +23,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <poll.h>
-<<<<<<< HEAD
-#include <sys/syscall.h>
-=======
 #ifndef NO_FINIT_MODULE
 #include <sys/syscall.h>
 #endif
-
->>>>>>> cm/cm-14.1
 
 #ifdef USES_TI_MAC80211
 #include <dirent.h>
