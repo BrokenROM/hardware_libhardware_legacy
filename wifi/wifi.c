@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <poll.h>
+
 #ifndef NO_FINIT_MODULE
 #include <sys/syscall.h>
 #endif
@@ -239,7 +240,6 @@ int insmod(const char *filename, const char *args)
     return ret;
 #endif
 }
-#endif
 
 int rmmod(const char *modname)
 {
